@@ -1,4 +1,4 @@
-# CAREERPLUS
+# Intervue
 
 ### *Project Overview*
 *Problem Statement Title*: An Interactive Job and Internship Platform for Technical Education  
@@ -8,12 +8,12 @@
 ---
 
 ## 📚 *About the Project*
-CAREERPLUS is an innovative platform designed to address the challenges faced by students and professionals in their career journey. By leveraging advanced technologies like AI, VR, blockchain, and workflow automation with *Kestra*, CAREERPLUS provides a holistic ecosystem for skill enhancement, mentorship, and verified job applications.  
+Intervue is an innovative platform designed to address the challenges faced by students and professionals in their career journey. By leveraging advanced technologies like AI, VR, blockchain, and workflow automation with *Kestra*, Intervue provides a holistic ecosystem for skill enhancement, mentorship, and verified job applications.  
 
 ---
 
 
-## 💡 *How Kestra is Used in CAREERPLUS*
+## 💡 *How Kestra is Used in Intervue*
 
 1. *Profile Score Generation*  
    - Kestra automates workflows by gathering data from multiple user interactions such as competency tests, uploaded resumes, and self-assessments.  
@@ -37,7 +37,7 @@ CAREERPLUS is an innovative platform designed to address the challenges faced by
 | *Competency Diagnostic Test*| Self-assessment with bias detection, SWOT analysis, and time-evolved skill-gap intensity heatmaps.                 |
 | *Skill Gap Analysis*        | Identify skill gaps and generate adaptive resources based on diagnostic reports linked to YouTube V3 API content. |
 | *Mentor & AI Career Coach*  | 1:1 mentoring sessions, instant video/audio calls, AI-generated summaries, and goal tracking with Jobie, the AI.  |
-| *Mock Interviews in VR*     | Immersive 360° AI-powered mock interviews with real-time feedback and detailed interview analysis.                  |
+| *Mock Interviews*     | Immersive 360° AI-powered mock interviews with real-time feedback and detailed interview analysis.                  |
 | *Auto-Apply System*         | Compares candidates across industries and automates bulk job applications with keyword-optimized documents.        |
 | *Blockchain Verification*   | Ethereum-based system for secure skill verification and certificate sharing using LinkedIn API integration.         |
 
@@ -63,7 +63,7 @@ CAREERPLUS is an innovative platform designed to address the challenges faced by
 
 ## 📎 *Important Links*
 
-- [Video Walkthrough](https://youtu.be/vKIokNsWy8M?si=QUHYA44J5teRiI6-)  
+- [Video Walkthrough](https://www.youtube.com/watch?v=UzFfahctz-A)  
 - [Project Source Code](#)  
 
 ---
