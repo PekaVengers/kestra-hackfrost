@@ -92,7 +92,7 @@ tasks:
         def connect_to_database():
             try:
                 print("Connecting to MongoDB...")
-                client = MongoClient("mongodb+srv://yashaswee:WyQCJzB2CQbqagRM@cluster.5euokdf.mongodb.net/kestra")
+                client = MongoClient("--")
                 print("Connected to database")
                 return client
             except Exception as error:

@@ -14,7 +14,7 @@ tasks:
         } from "@google/generative-ai"
         import mongoose from 'mongoose'
         console.log("Hello")
-        const apiKey = 'AIzaSyBHihqeh059QtHQu3jNcpzVJWuN2PJazhY';
+        const apiKey = '--';
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
