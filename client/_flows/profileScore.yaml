@@ -1,0 +1,114 @@
+id: profileScore
+namespace: company.team
+
+tasks:
+  - id: inference
+    type: io.kestra.core.tasks.scripts.Python
+    requirements:
+      - scikit-learn==1.5.2
+      - numpy
+      - pandas
+      - pymongo
+    inputFiles:
+      main.py: |
+        import pickle
+        import pandas as pd
+        import numpy as np
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.preprocessing import OneHotEncoder
+        from sklearn.compose import ColumnTransformer
+        import pymongo
+        import json
+        from pymongo import MongoClient
+        def sigmoid(x):
+            return 1 / (1 + np.exp(-x))
+        def input_fn(request_body, request_content_type='application/json'):
+            if request_content_type == 'application/json':
+                input_data = json.loads(request_body)
+                
+                df = pd.DataFrame([input_data])
+                DF = pd.read_csv('/app/data/company/team/_files/data.csv')
+                DF.dropna(inplace=True)
+                X = DF.drop(['Employed', 'Unnamed: 0'], axis=1)
+                # Define categorical columns
+                categorical_cols = ['Age', 'Accessibility', 'EdLevel', 'Gender', 'MentalHealth', 'MainBranch', 'Country']
+                # Preprocessing pipelines
+                vectorizer = TfidfVectorizer(stop_words='english', lowercase=True)
+                one_hot_encoder = OneHotEncoder(handle_unknown='ignore')
+                # Fit vectorizer and encoder separately for feature name extraction
+                vectorizer.fit(X['HaveWorkedWith'])
+                one_hot_encoder.fit(X[categorical_cols])
+                # Apply transformations using ColumnTransformer
+                transformer = ColumnTransformer([
+                    ('vectorizer', vectorizer, 'HaveWorkedWith'),
+                    ('encoder', one_hot_encoder, categorical_cols)
+                ])
+                X = transformer.fit_transform(X)
+                df = transformer.transform(df)
+                return df
+            else:
+                raise ValueError(f"Unsupported content type: {request_content_type}")
+        def predict_fn(input_data, model):
+            """
+            Make a prediction using the provided model and input data.
+            """
+            prediction = model.predict(input_data)
+            return prediction
+        def output_fn(prediction, accept='application/json'):
+            """
+            Format the prediction output as specified.
+            """
+            response = {'prediction': int(sigmoid(prediction[0])*100)}
+            if accept == 'application/json':
+                return json.dumps(response), accept
+            else:
+                raise ValueError(f"Unsupported accept type: {accept}")
+        def invoke():
+            print('runing')
+            with open("/app/data/company/team/_files/linear-model.pkl", 'rb') as model_file:
+                model = pickle.load(model_file)
+            data = {
+                "Age": "<35",
+                "Accessibility": "No",
+                "EdLevel": "Master",
+                "Employment": "1",
+                "Gender": "Man",
+                "MentalHealth": "No",
+                "MainBranch": "Dev",
+                "YearsCode": "7",
+                "YearsCodePro": "4",
+                "Country": "Sweden",
+                "PreviousSalary": 51552,
+                "HaveWorkedWith": "C++;Python;Git;PostgreSQL",
+                "ComputerSkills": 4
+            }
+            input_data = input_fn(json.dumps(data))
+            prediction = predict_fn(input_data, model)
+            response, content_type = output_fn(prediction)
+            return response
+            
+        varew = invoke()
+        # Connect to the MongoDB database
+        def connect_to_database():
+            try:
+                print("Connecting to MongoDB...")
+                client = MongoClient("mongodb+srv://yashaswee:WyQCJzB2CQbqagRM@cluster.5euokdf.mongodb.net/kestra")
+                print("Connected to database")
+                return client
+            except Exception as error:
+                print(f"Error connecting to database: {error}")
+                exit(1)
+        # Define the schema (MongoDB is schema-less, but we assume it's JSON-like)
+        def save_data(client):
+            try:
+                db = client["kestra"]
+                collection = db["profilescore"]
+                json_data = json.loads(varew)
+                result = collection.insert_one(json_data)
+                print("Data saved successfully!", f"Inserted ID: {result.inserted_id}")
+            except Exception as error:
+                print(f"Error saving data: {error}")
+            finally:
+                client.close()
+        mongo_client = connect_to_database()
+        save_data(mongo_client)

@@ -1,0 +1,89 @@
+id: testing
+namespace: company.team
+
+tasks:
+  - id: inference
+    type: io.kestra.plugin.scripts.node.Commands
+
+    inputFiles:
+      main.js: |
+        import {
+        GoogleGenerativeAI,
+        HarmCategory,
+        HarmBlockThreshold,
+        } from "@google/generative-ai"
+        import mongoose from 'mongoose'
+        console.log("Hello")
+        const apiKey = 'AIzaSyBHihqeh059QtHQu3jNcpzVJWuN2PJazhY';
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+        });
+        const generationConfig = {
+          temperature: 1,
+          topP: 0.95,
+          topK: 64,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+        };
+        async function generateCourseLayout(courseRecipe) {
+          const genCourseLayout = model.startChat({
+            generationConfig,
+          });
+          const result = await genCourseLayout.sendMessage(courseRecipe);
+          return result.response.text();
+        }
+        async function generateChapterContent(skill, chapterName) {
+          const genChapterContent = model.startChat({
+            generationConfig,
+          });
+          const prompt = `Explain the concept on Skill: ${skill}, Chapter: ${chapterName}, in pure JSON format with an array of OBJECTS with field as 'title', 'description', 'code' field in <precode> format if applicable, strictly keep within 200 characters limit.`;
+          const result = await genChapterContent.sendMessage(prompt);
+          return result.response.text();
+        }
+        const varew = await generateChapterContent('java','Java Basics'); 
+        console.log(varew);
+        const connectToDatabase = async () => {
+            try {
+                console.log('Connecting to MongoDB...')
+                await mongoose.connect("mongodb+srv://yashaswee:WyQCJzB2CQbqagRM@cluster.5euokdf.mongodb.net/kestra")
+                console.log('Connected to database')
+            } catch (error) {
+                console.error('Error connecting to database', error?.message ?? error)
+                process.exit(1)
+            }
+        }
+        connectToDatabase();
+        // Define the schema
+        const topicSchema = new mongoose.Schema({
+          title: {
+            type: String,
+            required: true,
+          },
+          description: {
+            type: String,
+            required: true,
+          },
+          code: {
+            type: String,
+            default: "",
+          },
+        });
+        const Topic = mongoose.model("swot", topicSchema);
+        const jsonData = varew;
+        (async function saveData() {
+          try {
+            const jsonData = JSON.parse(varew);
+            await Topic.insertMany(jsonData);
+            console.log("Data saved successfully!");
+          } catch (error) {
+            console.error("Error saving data:", error);
+          } finally {
+            mongoose.connection.close();
+          }
+        })();
+    commands:
+      - node main.js
+    beforeCommands:
+      - npm install @google/generative-ai
+      - npm i mongoose
